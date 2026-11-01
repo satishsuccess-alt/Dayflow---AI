@@ -1,0 +1,532 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101426">
+  <title>DayFlow AI — Plan Your Day</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#">
+      <span class="brand-icon">D</span>
+      <span>DayFlow <span class="brand-ai">AI</span></span>
+    </a>
+    <span class="status"><span class="status-dot"></span> Your day, your flow</span>
+  </header>
+
+
+  <nav class="main-nav" aria-label="Main navigation">
+    <button class="nav-button active" type="button" data-page="home-page">Home</button>
+    <button class="nav-button" type="button" data-page="workout-page">Workout Planner</button>
+    <button class="nav-button" type="button" data-page="diet-page">Diet Planner</button>
+    <button class="nav-button" type="button" data-page="profile-page">My Profile</button>
+    <button class="nav-button" type="button" data-page="challenges-page">Challenges</button>
+    <button class="nav-button" type="button" data-page="ai-coach">AI Coach</button>
+    <button class="nav-button" type="button" data-page="account-page">Account &amp; Sync</button>
+  </nav>
+
+  <main class="container">
+
+    <section id="account-page" class="page-view" aria-labelledby="account-title" hidden>
+      <section class="welcome page-welcome">
+        <p class="eyebrow">YOUR DATA, YOUR DEVICES</p>
+        <h1>Account <span>&amp; Sync.</span></h1>
+        <p class="subtitle">Create an account or sign in to sync your DayFlow AI progress across devices using the same online server.</p>
+      </section>
+      <section class="panel account-panel">
+        <div class="section-heading"><div><p class="eyebrow">CROSS-DEVICE SAVING</p><h2 id="account-title">Your DayFlow account</h2></div><span id="sync-status-pill" class="task-total">Not signed in</span></div>
+        <p id="account-status" class="form-note" role="status" aria-live="polite">Your current progress is saved on this device until you sign in and sync it.</p>
+        <form id="account-form" class="feature-form account-form">
+          <label>Username <input id="account-username" name="username" autocomplete="username" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" required placeholder="3–24 letters, numbers, or underscores"></label>
+          <label>Password <input id="account-password" name="password" type="password" autocomplete="current-password" minlength="12" maxlength="128" required placeholder="At least 12 characters"></label>
+          <div class="account-actions"><button class="primary-button" id="account-login" type="button">Sign in</button><button class="secondary-button" id="account-register" type="button">Create account</button><button class="secondary-button" id="account-logout" type="button" hidden>Sign out</button></div>
+        </form>
+        <p class="form-note">Use a unique password and keep it private. Accounts require the DayFlow server and PostgreSQL database to be running. Localhost works only on your computer; to use another device, the server must be deployed online over HTTPS.</p>
+      </section>
+    </section>
+
+
+    <div id="home-page" class="page-view active">
+    <section class="welcome">
+      <p class="eyebrow">YOUR PERSONAL DAILY PLANNER</p>
+      <h1>Make today <span>count.</span></h1>
+      <p class="subtitle">
+        Build better habits, organize your time, and make progress
+        one task at a time.
+      </p>
+    </section>
+
+    <section class="stats">
+      <article class="stat-card">
+        <span class="stat-label">Tasks completed</span>
+        <strong id="completed-count">0</strong>
+        <span class="stat-note">Keep moving forward</span>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Points earned</span>
+        <strong id="points-count">0 <small>pts</small></strong>
+        <span class="stat-note">Earn points as you go</span>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Daily progress</span>
+        <strong id="progress-count">0%</strong>
+        <div class="progress-track">
+          <div id="progress-bar" class="progress-bar"></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="weekly-progress panel" id="weekly-progress" aria-labelledby="weekly-progress-title">
+      <div class="section-heading">
+        <div><p class="eyebrow">YOUR CONSISTENCY</p><h2 id="weekly-progress-title">Weekly Progress</h2></div>
+        <span id="weekly-date-range" class="task-total">This week</span>
+      </div>
+      <p class="weekly-progress-intro">Track your daily routine progress from Monday to Sunday. Your weekly average updates as you go.</p>
+      <div class="weekly-chart" id="weekly-chart" role="img" aria-label="Weekly daily progress chart"></div>
+      <div class="weekly-summary-grid">
+        <article class="weekly-summary-card"><span class="stat-label" id="weekly-average-label">Week-to-date average</span><strong id="weekly-average">0%</strong><span class="stat-note" id="weekly-average-note">Your daily progress average</span></article>
+        <article class="weekly-summary-card"><span class="stat-label">Days tracked</span><strong id="weekly-days-tracked">0/7</strong><span class="stat-note">Days with a saved routine</span></article>
+        <article class="weekly-summary-card"><span class="stat-label">Last completed week</span><strong id="weekly-last-average">—</strong><span class="stat-note" id="weekly-last-average-note">Available after your first week</span></article>
+      </div>
+      <div id="weekly-celebration-message" class="weekly-celebration-message" role="status" hidden></div>
+      <p class="weekly-progress-footnote">Daily progress is based on completed tasks. Sign in to Account & Sync to back up your history across devices.</p>
+    </section>
+
+    <section class="planner panel">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">YOUR PLAN</p>
+          <h2>Today's routine</h2>
+        </div>
+        <span id="task-total" class="task-total">0 tasks</span>
+      </div>
+
+      <form id="task-form" class="task-form">
+        <label>
+          Task name
+          <input id="task-name" type="text"
+            placeholder="e.g. Read a book" maxlength="100" required>
+        </label>
+
+        <div class="form-row">
+          <label>
+            Start time
+            <input id="task-time" type="time" required>
+          </label>
+          <label>
+            Duration
+            <select id="task-duration">
+              <option value="10">10 minutes</option>
+              <option value="20">20 minutes</option>
+              <option value="30">30 minutes</option>
+              <option value="45">45 minutes</option>
+              <option value="60">60 minutes</option>
+              <option value="90">90 minutes</option>
+              <option value="120">120 minutes</option>
+            </select>
+          </label>
+        </div>
+
+        <button class="primary-button" type="submit">+ Add task</button>
+      </form>
+
+      <div id="task-list" class="task-list">
+        <div id="empty-state" class="empty-state">
+          <span class="empty-icon">✦</span>
+          <h3>Your day starts here</h3>
+          <p>Add your first task to begin building your routine.</p>
+        </div>
+      </div>
+    </section>
+
+    
+<section class="focus-timer panel" id="focus-timer" aria-labelledby="focus-timer-title">
+  <div class="section-heading">
+    <div><p class="eyebrow">FOCUS & RESET</p><h2 id="focus-timer-title">Focus Timer</h2></div>
+    <span class="task-total">30 min focus · 5 min break</span>
+  </div>
+  <p class="focus-timer-intro">Focus on one task for 30 minutes, then take a 5-minute break. The timer repeats with no long-break cycle.</p>
+  <div class="focus-timer-display" aria-live="polite">
+    <span id="focus-timer-phase" class="focus-timer-phase">Focus session</span>
+    <strong id="focus-timer-clock" class="focus-timer-clock">30:00</strong>
+    <span id="focus-timer-status" class="focus-timer-status">Ready when you are.</span>
+  </div>
+  <div class="focus-timer-actions">
+    <button id="focus-timer-start" class="primary-button" type="button">Start focus</button>
+    <button id="focus-timer-reset" class="secondary-button" type="button">Reset timer</button>
+  </div>
+  <p class="form-note">Tip: choose one task before starting. You can pause whenever you need to.</p>
+</section>
+
+<section class="ai-coach panel" id="ai-coach">
+  <div class="coach-heading">
+    <div class="coach-avatar">✦</div>
+    <div>
+      <p class="eyebrow">YOUR PERSONAL AI</p>
+      <h2>Meet your AI Coach</h2>
+      <p class="coach-description">
+        Your friendly companion for routines, habits and daily goals.
+      </p>
+    </div>
+    <span class="coach-status">Coach</span>
+  </div>
+
+  <div class="chat-messages" id="chat-messages" aria-live="polite">
+    <div class="chat-message assistant-message">
+      <div class="message-avatar">✦</div>
+      <div class="message-content">
+        <span class="message-sender">DayFlow AI</span>
+        <p>Hey! Welcome to your AI Coach. What would you like help with today? We can work on your routine, build better habits or plan your goals!</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-suggestions">
+    <button type="button" class="suggestion-button"
+      data-prompt="Help me improve my daily routine.">
+      Improve my routine
+    </button>
+    <button type="button" class="suggestion-button"
+      data-prompt="Help me build better habits.">
+      Build better habits
+    </button>
+    <button type="button" class="suggestion-button"
+      data-prompt="Help me make a realistic study plan.">
+      Study plan
+    </button>
+    <button type="button" class="suggestion-button"
+      data-prompt="I feel overwhelmed. Help me choose one small next step.">
+      I'm overwhelmed
+    </button>
+  </div>
+
+  <form id="chat-form" class="chat-form">
+    <label class="sr-only" for="chat-input">Message your AI Coach</label>
+    <textarea id="chat-input" rows="1" maxlength="2000"
+      placeholder="Ask your AI Coach anything..."
+      required></textarea>
+    <button type="submit" id="chat-send" class="send-button"
+      aria-label="Send message">Send ➤</button>
+  </form>
+
+  <p class="chat-note">
+    Your AI Coach can make mistakes. Review important suggestions carefully.
+  </p>
+
+</section>
+    </div>
+
+    <section id="workout-page" class="page-view" aria-labelledby="workout-title" hidden>
+      <section class="welcome page-welcome">
+        <p class="eyebrow">YOUR FREE HOME WORKOUT PLAN</p>
+        <h1>Build strength, <span>one step at a time.</span></h1>
+        <p class="subtitle">Create a simple beginner-friendly plan using bodyweight exercises—no gym or paid AI service needed.</p>
+      </section>
+      <section class="panel">
+        <div class="section-heading"><div><p class="eyebrow">YOUR SETTINGS</p><h2>Personalize your plan</h2></div><span class="task-total">Free · On this device</span></div>
+        <form id="workout-settings-form" class="feature-form workout-settings-grid">
+          <label>Goal
+            <select id="workout-goal"><option value="strength" selected>Build strength</option><option value="general">General fitness</option><option value="endurance">Improve endurance</option><option value="mobility">Flexibility &amp; mobility</option></select>
+          </label>
+          <label>Experience
+            <select id="workout-level"><option value="beginner" selected>Beginner</option><option value="intermediate">Intermediate</option></select>
+          </label>
+          <label>Days per week
+            <select id="workout-days"><option value="2">2 days</option><option value="3" selected>3 days</option><option value="4">4 days</option><option value="5">5 days</option></select>
+          </label>
+          <label>Session length
+            <select id="workout-duration"><option value="15">15 minutes</option><option value="20">20 minutes</option><option value="30" selected>30 minutes</option><option value="45">45 minutes</option></select>
+          </label>
+          <label>Equipment
+            <select id="workout-equipment"><option value="none" selected>No equipment at home</option><option value="home">Basic home equipment</option></select>
+          </label>
+          <button class="primary-button workout-generate" type="submit">Generate my plan</button>
+        </form>
+        <p class="form-note">Start gently, use a comfortable range of motion, and rest whenever needed. Stop if you feel pain, dizziness, or unwell. This general plan is not medical advice.</p>
+      </section>
+      <section class="panel">
+        <div class="section-heading"><div><p class="eyebrow">YOUR WEEKLY ROUTINE</p><h2>Three-day strength plan</h2></div><span id="workout-plan-label" class="task-total">3 × 30 min</span></div>
+        <div id="workout-plan" class="workout-plan-grid" aria-live="polite"></div>
+        <p id="workout-plan-status" class="form-note" aria-live="polite"></p>
+      </section>
+      <section class="panel">
+        <div class="section-heading"><div><p class="eyebrow">YOUR PROGRESS</p><h2>Workout tracker</h2></div></div>
+        <div class="social-stats workout-stats">
+          <article class="stat-card"><span class="stat-label">Sessions completed</span><strong id="workout-completed-count">0</strong><span class="stat-note">Every session counts</span></article>
+          <article class="stat-card"><span class="stat-label">This week's sessions</span><strong id="workout-week-count">0 / 3</strong><span class="stat-note">A flexible weekly target</span></article>
+          <article class="stat-card"><span class="stat-label">Current plan</span><strong id="workout-current-goal">Strength</strong><span class="stat-note">Saved in this browser</span></article>
+        </div>
+        <button id="workout-reset-week" class="secondary-button" type="button">Reset this week's tracking</button>
+        <p class="form-note">Tracking is stored locally until you sign in to Account & Sync.</p>
+      </section>
+    </section>
+
+    <section id="diet-page" class="page-view" aria-labelledby="diet-title" hidden>
+      <section class="welcome page-welcome">
+        <p class="eyebrow">FOOD THAT FITS YOUR LIFE</p>
+        <h1>Your <span>Diet Planner.</span></h1>
+        <p class="subtitle">Plan a week of balanced meal ideas around your preferences. Review ingredients and labels carefully, especially when you have allergies.</p>
+      </section>
+
+      <section class="panel">
+        <div class="section-heading">
+          <div><p class="eyebrow">YOUR PREFERENCES</p><h2>Make this plan yours</h2></div>
+        </div>
+        <form id="diet-preferences-form" class="feature-form">
+          <label>Eating preference
+            <select id="diet-style">
+              <option value="balanced">Balanced / no specific preference</option>
+              <option value="halal">Halal-friendly ideas</option>
+              <option value="vegetarian">Vegetarian</option>
+              <option value="vegan">Vegan</option>
+            </select>
+          </label>
+          <label>Nutrition goal
+            <select id="diet-goal">
+              <option value="balanced">Balanced health &amp; energy</option>
+              <option value="bulking">Bulking / support muscle growth</option>
+              <option value="cutting">Cutting / balanced body-composition support</option>
+            </select>
+          </label>
+          <label>Allergies or intolerances
+            <input id="diet-allergies" type="text" maxlength="250" placeholder="e.g. peanuts, dairy">
+          </label>
+          <label>Foods you want to avoid
+            <input id="diet-exclusions" type="text" maxlength="250" placeholder="e.g. mushrooms, olives">
+          </label>
+          <label>Supplement preference
+            <select id="diet-supplements">
+              <option value="no">No supplements — food-based plan</option>
+              <option value="yes">Yes — include general supplement information</option>
+            </select>
+          </label>
+          <label>Meals per day
+            <select id="diet-meal-count">
+              <option value="3">3 meals</option>
+              <option value="4">3 meals + snack</option>
+              <option value="5">3 meals + 2 snacks</option>
+            </select>
+          </label>
+          <button class="primary-button" type="submit">Save preferences &amp; build my week</button>
+        </form>
+        <p class="form-note">Allergy reminder: this planner filters its example ingredients, but it cannot guarantee a meal is allergen-free. Check packaging, preparation surfaces and cross-contact risks, and ask a trusted adult or qualified professional when unsure.</p>
+        <p id="supplement-info-note" class="form-note" aria-live="polite">Your plan will focus on food and meals, without supplement information.</p>
+      </section>
+
+      <section class="panel">
+        <div class="section-heading">
+          <div><p class="eyebrow">7-DAY PLAN</p><h2>This week's meal ideas</h2></div>
+          <button id="regenerate-meals" class="secondary-button" type="button">Refresh ideas</button>
+        </div>
+        <div id="meal-plan" class="meal-grid"></div>
+        <p id="meal-plan-note" class="form-note" aria-live="polite"></p>
+      </section>
+      <section class="panel">
+        <div class="section-heading">
+          <div><p class="eyebrow">YOUR COLLECTION</p><h2>Saved meals</h2></div>
+          <span id="saved-meal-count" class="task-total">0 saved</span>
+        </div>
+        <div id="saved-meals" class="saved-meals"></div>
+      </section>
+    </section>
+
+    <section id="profile-page" class="page-view" aria-labelledby="profile-title" hidden>
+      <section class="welcome page-welcome">
+        <p class="eyebrow">YOUR PERSONAL SPACE</p>
+        <h1>Make it <span>yours.</span></h1>
+        <p class="subtitle">Set up your profile, choose a look, and keep your goals and achievements together on this device.</p>
+      </section>
+      <section class="panel">
+        <div class="section-heading">
+          <div><p class="eyebrow">PROFILE MAKER</p><h2>About you</h2></div>
+        </div>
+        <form id="profile-form" class="feature-form">
+          <div class="profile-preview-wrap">
+            <div id="profile-avatar" class="profile-avatar" aria-label="Profile picture preview">D</div>
+            <label class="upload-label">Profile picture
+              <input id="profile-picture" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+            </label>
+            <button id="remove-picture" class="secondary-button" type="button">Remove picture</button>
+          </div>
+          <label>Display name
+            <input id="profile-name" type="text" maxlength="50" placeholder="What should we call you?">
+          </label>
+          <label>Short bio
+            <textarea id="profile-bio" rows="3" maxlength="180" placeholder="A little about you (optional)"></textarea>
+          </label>
+          <label>My main goal
+            <select id="profile-goal">
+              <option value="Build consistent habits">Build consistent habits</option>
+              <option value="Stay organized">Stay organized</option>
+              <option value="Improve study routines">Improve study routines</option>
+              <option value="Feel fitter and more energetic">Feel fitter and more energetic</option>
+              <option value="Eat a variety of balanced meals">Eat a variety of balanced meals</option>
+              <option value="Make time for hobbies">Make time for hobbies</option>
+            </select>
+          </label>
+          <label>Food preference
+            <select id="profile-diet-style">
+              <option value="balanced">Balanced / no specific preference</option>
+              <option value="halal">Halal-friendly ideas</option>
+              <option value="vegetarian">Vegetarian</option>
+              <option value="vegan">Vegan</option>
+            </select>
+          </label>
+          <label>Food allergies or intolerances
+            <input id="profile-allergies" type="text" maxlength="250" placeholder="e.g. peanuts, dairy">
+          </label>
+          <label>Foods to avoid
+            <input id="profile-exclusions" type="text" maxlength="250" placeholder="e.g. mushrooms, olives">
+          </label>
+          <label>Theme
+            <select id="profile-theme">
+              <option value="violet">Violet &amp; teal</option>
+              <option value="ocean">Ocean blue</option>
+              <option value="forest">Forest green</option>
+              <option value="sunset">Sunset</option>
+            </select>
+          </label>
+          <button class="primary-button" type="submit">Save my profile</button>
+        </form>
+      </section>
+      <section class="panel">
+        <div class="section-heading"><div><p class="eyebrow">YOUR JOURNEY</p><h2>Progress &amp; badges</h2></div></div>
+        <div class="profile-stats">
+          <article class="stat-card"><span class="stat-label">Tasks completed</span><strong id="profile-completed">0</strong></article>
+          <article class="stat-card"><span class="stat-label">Points earned</span><strong id="profile-points">0</strong></article>
+          <article class="stat-card"><span class="stat-label">Meals completed</span><strong id="profile-meals-completed">0</strong></article>
+        </div>
+        <div id="profile-badges" class="badge-grid"></div>
+        <p class="form-note">Your profile and plans are stored locally until you sign in to Account & Sync.</p>
+      </section>
+    </section>
+
+
+    <section id="challenges-page" class="page-view" aria-labelledby="challenges-title" hidden>
+      <section class="welcome page-welcome">
+        <p class="eyebrow">SMALL STEPS, SHARED PROGRESS</p>
+        <h1>Challenge <span>yourself.</span></h1>
+        <p class="subtitle">Choose a challenge, log a win, and encourage yourself. This first version keeps your activity on this device.</p>
+      </section>
+
+      <section class="panel">
+        <div class="section-heading">
+          <div><p class="eyebrow">YOUR WEEK</p><h2>Skip allowance &amp; points</h2></div>
+          <span class="task-total" id="skip-week-label">This week</span>
+        </div>
+        <div class="social-stats">
+          <article class="stat-card"><span class="stat-label">Skips remaining</span><strong id="skips-remaining">3</strong><span class="stat-note">Three included each week</span></article>
+          <article class="stat-card"><span class="stat-label">Extra skips</span><strong id="extra-skips-count">0</strong><span class="stat-note">Bought with checklist points</span></article>
+          <article class="stat-card"><span class="stat-label">Available points</span><strong id="social-points-balance">0</strong><span class="stat-note">Earned from completed tasks</span></article>
+        </div>
+        <div class="social-actions-row">
+          <button id="buy-extra-skip" class="primary-button" type="button">Get 1 extra skip · 250 pts</button>
+          <button id="use-skip" class="secondary-button" type="button">Use a skip today</button>
+        </div>
+        <p id="skip-status" class="form-note" aria-live="polite">Skips help you take a planned break; they do not erase your progress. Extra skips cost 250 points each.</p>
+      </section>
+
+      <section class="panel">
+        <div class="section-heading"><div><p class="eyebrow">PICK YOUR FOCUS</p><h2>Challenges</h2></div><span id="challenge-count" class="task-total">0 active</span></div>
+        <div id="challenge-grid" class="challenge-grid"></div>
+        <p class="form-note">Choose goals that feel realistic for you. Rest days and changing a goal are okay.</p>
+      </section>
+
+      <section class="panel">
+        <div class="section-heading"><div><p class="eyebrow">LOG A WIN</p><h2>Challenge check-in</h2></div></div>
+        <form id="challenge-checkin-form" class="feature-form">
+          <label>Challenge
+            <select id="checkin-challenge" required></select>
+          </label>
+          <label>What did you do? (optional)
+            <input id="checkin-note" type="text" maxlength="180" placeholder="e.g. Took a short walk">
+          </label>
+          <label class="upload-label">Optional photo proof
+            <input id="checkin-photo" type="file" accept="image/png,image/jpeg,image/webp">
+          </label>
+          <button class="primary-button" type="submit">Save check-in</button>
+        </form>
+        <p class="form-note">Photos are optional and stay in this browser. Avoid including private information, school details, addresses, or other people without their permission. A photo is not required to count your effort.</p>
+      </section>
+
+      <section class="panel">
+        <div class="section-heading"><div><p class="eyebrow">SMART SCROLL</p><h2>Your progress feed</h2></div><button id="activate-smart-scroll" class="primary-button" type="button">✦ Enable Smart Scroll</button></div>
+        <div class="smart-scroll-status-card">
+          <div class="smart-scroll-status-copy"><span id="smart-scroll-state" class="smart-scroll-state">Smart Scroll is off</span><p id="smart-scroll-reward-note">Activate Smart Scroll to start earning routine points and unlock the challenge tools.</p></div>
+          <div class="smart-scroll-mini-stats">
+            <div><span>Points</span><strong id="smart-scroll-points">0</strong></div>
+            <div><span>Skips left</span><strong id="smart-scroll-skips">3</strong></div>
+            <div><span>Screen-time allowance</span><strong id="smart-scroll-time">30 min</strong></div>
+          </div>
+        </div>
+        <div class="smart-scroll-launcher panel-inset">
+          <h3>Try opening a social platform</h3>
+          <p class="form-note">When Smart Scroll is active, choose a quick movement break or use a skip before continuing. These demo buttons open the platform after your choice; they cannot detect app use outside DayFlow AI.</p>
+          <div class="social-platform-buttons">
+            <button class="secondary-button social-launch" type="button" data-platform="Instagram" data-url="https://www.instagram.com/">Instagram</button>
+            <button class="secondary-button social-launch" type="button" data-platform="TikTok" data-url="https://www.tiktok.com/">TikTok</button>
+            <button class="secondary-button social-launch" type="button" data-platform="YouTube" data-url="https://www.youtube.com/">YouTube</button>
+            <button class="secondary-button social-launch" type="button" data-platform="Snapchat" data-url="https://www.snapchat.com/">Snapchat</button>
+          </div>
+        </div>
+        <form id="social-post-form" class="post-composer">
+          <label for="social-post-text">Share a small win or encouraging message</label>
+          <textarea id="social-post-text" rows="3" maxlength="280" placeholder="One small step I took today was…"></textarea>
+          <div class="social-actions-row"><span class="form-note">Keep it kind. Don't post private information.</span><button class="primary-button" type="submit">Post to my feed</button></div>
+        </form>
+        <div id="social-feed" class="social-feed" aria-live="polite"></div>
+        <p class="form-note">Smart Scroll is optional. This demo feed is private to this browser; it does not publish posts or connect real friends yet.</p>
+      </section>
+    </section>
+
+    <dialog id="smart-scroll-activation-dialog" class="smart-scroll-dialog activation-dialog" aria-labelledby="smart-scroll-activation-title">
+      <form method="dialog">
+        <div class="activation-icon">✦</div>
+        <p class="eyebrow">YOUR FOCUS, YOUR CHOICE</p>
+        <h2 id="smart-scroll-activation-title">Activate Smart Scroll?</h2>
+        <p class="form-note">Turn on Smart Scroll to unlock routine points, your weekly skips, and movement-break prompts before opening social platforms.</p>
+        <ul class="activation-benefits">
+          <li>Earn points by completing your daily routine while Smart Scroll is active.</li>
+          <li>Get 3 included skips each week.</li>
+          <li>Track a 30-minute allowance in this demo. DayFlow cannot measure time spent in other apps.</li>
+        </ul>
+        <div class="smart-scroll-dialog-actions">
+          <button id="confirm-smart-scroll" class="primary-button" type="button">Activate Smart Scroll</button>
+          <button id="cancel-smart-scroll-activation" class="secondary-button" type="button">Maybe later</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="smart-scroll-dialog" class="smart-scroll-dialog" aria-labelledby="smart-scroll-title">
+      <form method="dialog" id="smart-scroll-dialog-form">
+        <p class="eyebrow">SMART SCROLL BREAK</p>
+        <h2 id="smart-scroll-title">Choose a quick movement break</h2>
+        <p id="smart-scroll-platform-note" class="form-note">Pick an exercise before continuing.</p>
+        <label for="smart-scroll-exercise">Choose an easy option</label>
+        <select id="smart-scroll-exercise">
+          <option value="Gentle stretching for 10 seconds">Gentle stretching · 10 seconds</option>
+          <option value="March in place for 10 seconds">March in place · 10 seconds</option>
+          <option value="5 comfortable squats">5 comfortable squats</option>
+          <option value="5 wall push-ups">5 wall push-ups</option>
+          <option value="Take 3 slow breaths">Take 3 slow breaths</option>
+        </select>
+        <div class="smart-scroll-dialog-actions">
+          <button id="smart-scroll-complete" class="primary-button" type="button">Done — continue</button>
+          <button id="smart-scroll-skip" class="secondary-button" type="button">Skip exercise</button>
+          <button id="smart-scroll-cancel" class="secondary-button" type="button">Cancel</button>
+        </div>
+        <p id="smart-scroll-dialog-status" class="form-note" aria-live="polite"></p>
+      </form>
+    </dialog>
+    <footer>
+      <span>DayFlow AI</span>
+      <span>Plan your day. Build your habits.</span>
+    </footer>
+  </main>
+</body>
+</html>
