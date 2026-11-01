@@ -272,7 +272,7 @@ async function startServer() {
   } else {
     console.log("Account sync is currently disabled. Configure DATABASE_URL and SESSION_SECRET to enable it.");
   }
-  app.listen(port, () => {
+ app.listen(port, "0.0.0.0", () => {
     console.log(`DayFlow AI is running at http://localhost:${port}`);
     console.log(process.env.OPENAI_API_KEY
       ? `AI Coach API configured (model: ${process.env.OPENAI_MODEL || "gpt-4.1-mini"}).`
